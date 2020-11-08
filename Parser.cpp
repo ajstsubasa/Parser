@@ -10,6 +10,7 @@ void printParsetree(Pair *);
 bool contains(char *);
 bool checkforwhile(char *);
 bool checkforElse(char *);
+int calculateJump(char *);
 
 int main()
 {
@@ -18,7 +19,8 @@ int main()
 	char temp[40] ="x=2;y=2;";
 	char temp2[55] = "x=2;y=2;if(x=2){x=2;}";
 	char temp3[55] = "if(x<2){y=2;}x=2;";
-	char temp4[55] = "if(x<2){z=2;}else{z=2;}z=2;";
+	char temp4[55] = "if(x<22345){z=223;}else{z=223;}z=223;";
+	//char temp5[55] = "for(i=0;i<56;i++){x=2;}";
 	buffer = temp4;
 	
 	Pair *p = Parser(buffer); //new Pair(nullptr, Parser(buffer), '[');;
@@ -72,7 +74,7 @@ Pair *Parser(char *buff)
 		return p;
 		
 	}
-	if (checkforElse(buff))   //check if we have to parse a while loop
+	if (checkforElse(buff))   //check if we have to parse a Else loop
 	{
 		Pair *p = new Pair('E', 'F'); //If is Type I
 		; // move the buffer forward.
@@ -88,13 +90,15 @@ Pair *Parser(char *buff)
 
 	
 	
-	if (contains(buff + 1))
+	if (contains(buff + 1)) 
 	{
 		
-		Pair *p = new  Pair(*(buff), 'v');
+		Pair *p = new  Pair(*(buff), 'v'); //this is where i will fix multichar variables names issue.
 		Pair *t = Parser(buff + 2);  //pass the second char after buff
 		result = new  Pair(p, t, *(buff + 1));
 		//cout << *(buff + 2) << endl;
+		int jump = calculateJump(buff);
+		buff = buff + jump; //move buffer ahead by jump so below logic works.//since i am moving buffer by constant.
 
 		if (*(buff + 3) == ';' && *(buff + 4) != '\0')
 		{
@@ -137,11 +141,36 @@ Pair *Parser(char *buff)
 	
 
 
-	if (*(buff) == '4' || (*(buff) == '2'))
+	//if (*(buff) == '4' || (*(buff) == '2')) //Checking for digits.
+	char val[10];
+	for (int i = 0; i < sizeof(val) / sizeof(val[0]); i++)
 	{
-		Pair *q = new Pair(*(buff), 'v');
+		val[i] = 'N';
 
-		return q;
+	}
+	while(isdigit(*(buff)))
+	{ //This is where you ar going to fix the more then 1 digit parsing 
+		// problem //.
+		char temp = *(buff);
+		for (int i = 0; i < sizeof(val) / sizeof(val[0]); i++)
+		{
+			if (val[i] == 'N')
+			{
+				val[i] = temp;
+				break;
+			}
+
+		}
+		buff = buff + 1;
+		if (!isdigit(*(buff)))
+		{
+			buff = buff - 1; //set buff back to last digit
+
+			Pair *q = new Pair(val, 'd');
+			return q;
+		}
+
+
 	}
 	
 	
@@ -174,7 +203,14 @@ void printParsetree(Pair *p)
 	if (p)
 	{
 		printParsetree(p->left);
-		cout << p->value;
+		if (p->type == 'd')
+		{
+			cout << p->val;;
+		}
+		else
+		{
+			cout << p->value;
+		}
 		printParsetree(p->right);
 
 	}
@@ -206,6 +242,22 @@ bool checkforElse(char *buff)
 	}
 	return false;
 
+}
+int calculateJump(char *buffer)
+{
+	int jump = 0;
+	while (!(isdigit(*buffer)))
+	{
+		buffer = buffer + 1;
+	}
+
+	while ((isdigit(*buffer)))
+	{
+		jump = jump + 1;
+		buffer = buffer + 1;
+	}
+
+	return jump-1;
 }
 
 
