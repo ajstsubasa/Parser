@@ -10,6 +10,7 @@ void printParsetree(Pair *);
 bool contains(char *);
 bool checkforwhile(char *);
 bool checkforElse(char *);
+bool checkforFor(char *);
 int calculateJump(char *);
 
 int main()
@@ -18,11 +19,19 @@ int main()
 
 	char temp[40] ="x=2;y=2;";
 	char temp2[55] = "x=2;y=2;if(x=2){x=2;}";
-	char temp3[55] = "if(x<2){y=2;}x=2;";
+	char temp3[55] = "if(x==2){y=2;}x=2;";
 	char temp4[55] = "if(x<22345){z=223;}else{z=223;}z=223;";
-	//char temp5[55] = "for(i=0;i<56;i++){x=2;}";
-	buffer = temp4;
-	
+	char temp5[62] = "for(i=0;i<56;i++){for(j=0;j<56;j++){if(x=2){x=3;}";
+	char temp6[55] = "if(x<1){y=2;x=2;z=2;t=2;}";
+	buffer = temp5;
+	/*
+	for(i=0;i<56;i++){for(j=0;j<56;j++){if(x=2){x=3;};}  gets parsed into :
+	Fi=0[i<56[iE(Fj=0[j<56[jE(Ix=2(x=3)
+
+	F means a for loop has started ,until we see a ( , we are in the for loop.
+	then another for loop has started ,inside the for loop is an if statement checking if x=2. ) means end of if
+
+	*/
 	Pair *p = Parser(buffer); //new Pair(nullptr, Parser(buffer), '[');;
 	printParsetree(p);
 
@@ -86,18 +95,52 @@ Pair *Parser(char *buff)
 		return p;
 
 	}
+	if (checkforFor(buff))   //check if we have to parse a Else loop
+	{
+		Pair *p = new Pair('F', 'C'); //If is Type I
+		; // move the buffer forward.
+		buff = buff + 4; //for(x) , iterator moves to x.
+		Pair *t = Parser(buff);
+		//MoveIfLeft(Pair *p,Pair *t);
+		p->right = t;
+
+		return p;
+
+	}
+	
 
 
 	
 	
 	if (contains(buff + 1)) 
 	{
-		
+		char oper[2];
+		char *dummy = buff + 1;
+		int i = 0;
+		while (contains(dummy))
+		{
+			oper[i] = *(dummy);
+			dummy = dummy + 1;
+			i = i + 1;
+
+
+		}
+		int operjump = i-1;// oper jump is used to fix issue with len>1 operators like i++; ==;
+
 		Pair *p = new  Pair(*(buff), 'v'); //this is where i will fix multichar variables names issue.
-		Pair *t = Parser(buff + 2);  //pass the second char after buff
-		result = new  Pair(p, t, *(buff + 1));
+		Pair *t = Parser(buff + 2+operjump);  //pass the second char after buff
+		if (operjump == 0)
+		{
+			result = new  Pair(p, t, *(buff + 1));
+		}
+		else
+		{
+			result = new  Pair(p, t, *(buff+1),'E'); // if the operator length >1;
+
+		}
 		//cout << *(buff + 2) << endl;
-		int jump = calculateJump(buff);
+		 //buff + lenght of operator -1;
+		int jump = calculateJump(buff)+operjump;
 		buff = buff + jump; //move buffer ahead by jump so below logic works.//since i am moving buffer by constant.
 
 		if (*(buff + 3) == ';' && *(buff + 4) != '\0')
@@ -122,11 +165,22 @@ Pair *Parser(char *buff)
 			//Pair *t = Parser(buff + 1);
 			//return t;
 		}
-		if (*(buff + 4) == '{' && *(buff + 5) != '\0')
+		if (*(buff + 4) == '{' && *(buff + 5) != '\0') 
 		{
 			//cout << "yo";
 
 			Pair *res = new Pair(result, Parser(buff + 5), '(');   //if(x=2){z=2;z=3;}x=2;
+
+			return res;
+
+			//Pair *t = Parser(buff + 1);
+			//return t;
+		}
+		if ((isalpha(*(buff+4))))
+		{
+			//cout << "yo";
+
+			Pair *res = new Pair(result, Parser(buff + 4), '(');   //if(x=2){z=2;z=3;}x=2;
 
 			return res;
 
@@ -235,6 +289,19 @@ bool checkforElse(char *buff)
 	if (*(buff) == 'e' &&*(buff + 1) == 'l') // "we have a else"
 	{
 		if (*(buff + 2) == 's'&&*(buff + 3) == 'e')
+		{
+			return true;
+		}
+
+	}
+	return false;
+
+}
+bool checkforFor(char *buff)
+{
+	if (*(buff) == 'f' &&*(buff + 1) == 'o') // "we have a else"
+	{
+		if (*(buff + 2) == 'r')
 		{
 			return true;
 		}

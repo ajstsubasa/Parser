@@ -10,6 +10,7 @@ public:
 
 public:
 	 char val[10];
+	 char oper[2];
 
 public:
 	Pair(Pair *l, Pair *r, char t) {
@@ -18,6 +19,14 @@ public:
 		right = r;
 		this->type = t;
 		this->value = t;
+	}
+	Pair(Pair *l, Pair *r, char t, char value) {
+
+		left = l;
+		right = r;
+		this->type = t;
+		this->value = value;
+		
 	}
 	Pair()
 	{
