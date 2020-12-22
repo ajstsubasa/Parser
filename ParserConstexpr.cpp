@@ -215,7 +215,7 @@ constexpr Pair *Parser(Mem<100> *m, const char *buff, int curr_index)
 		}
 		else
 		{
-			Pair  s =   Pair(p, nullptr, *(buff + 1), 'E'); // if the operator length >1;
+			Pair  s =   Pair(nullptr, nullptr, *(buff + 1), 'E'); // if the operator length >1;
 			result = &s;
 			result->setcurr_index(curr_index);
 			result->setleft_index(result->getcurr_index() + 1);
