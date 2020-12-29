@@ -1,40 +1,40 @@
 // Parser.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 
-#include <iostream>
-#include"Pair.h"
-#include"If.h"
-#include"While.h"
-#include"Else.h"
-#include"For.h"
-#include"Seq.h"
+#include <iostream> 
+#include"Pair.h" 
+#include"If.h" 
+#include"While.h" 
+#include"Else.h" 
+#include"For.h" 
+#include"Seq.h" 
 
-using namespace std;
-//constexpr Pair *Parser(const char );
-void printParsetree(Pair *);
-//bool contains(const char *);
-constexpr bool checkforwhile(const char *);
-constexpr bool checkforElse(const char *);
-constexpr bool checkforFor(const char *);
-constexpr int calculateJump(const char *);
+using namespace std; 
+//constexpr Pair *Parser(const char ); 
+void printParsetree(Pair *); 
+//bool contains(const char *); 
+constexpr bool checkforwhile(const char *); 
+constexpr bool checkforElse(const char *); 
+constexpr bool checkforFor(const char *); 
+constexpr int calculateJump(const char *); 
 
-template<std::size_t amnt> struct Mem {
-	Pair mem[amnt];
-};
+template<std::size_t amnt> struct Mem { 
+	Pair mem[amnt]; 
+}; 
 
-constexpr bool contains(const char *t)
-{
-	//char *opers = new char[10];
-	char temp[10] = "+-=*/<>|&";
-	int len = sizeof(temp) / sizeof(temp[0]);
-	//opers = temp;
-	for (char i = 0; i < len; i++)
-	{
-		if (*t == temp[i])
-		{
-			return true;
+constexpr bool contains(const char *t) 
+{ 
+	//char *opers = new char[10]; 
+	char temp[10] = "+-=*/<>|&"; 
+	int len = sizeof(temp) / sizeof(temp[0]); 
+	//opers = temp; 
+	for (char i = 0; i < len; i++) 
+	{ 
+		if (*t == temp[i]) 
+		{ 
+			return true; 
 
-		}
+		} 
 
 	}
 	//delete [] opers;
